@@ -18,8 +18,7 @@ export class PeopleStorageGateway implements personRepository {
         return {
             status: 500,
             error: true,
-            message: 'Error en el servidor',
-            data: []
+            message: 'Error en el servidor'
         } as ResponseApi<Person>;
     };
 
@@ -32,7 +31,7 @@ export class PeopleStorageGateway implements personRepository {
                 status: 200,
                 error: false,
                 message: 'Personas encontradas',
-                data
+                entities: data
             } as ResponseApi<Person>
         }).catch(() => {
             return this.getError()
@@ -47,7 +46,7 @@ export class PeopleStorageGateway implements personRepository {
                 status: 200,
                 error: false,
                 message: 'Persona encontrada',
-                data
+                entity: data[0]
             } as ResponseApi<Person>
         }).catch(() => {
             return this.getError()

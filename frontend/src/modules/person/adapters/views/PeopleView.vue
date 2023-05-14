@@ -26,8 +26,7 @@
                         <div class="col-md-12">
                             <b-table striped hover :fields="colums" :items="people">
                                 <template #cell(actions)="data">
-                                    <button class="btn btn-primary " v-b-modal.modal-2>info</button>
-                                    <button class="btn btn-warning " v-b-modal.modal-2>actualizar</button>
+                                    <button class="btn btn-warning" @click="findPerson(data.item.id)" v-b-modal.modal-1>actualizar</button>
                                 </template>
                                 
                             </b-table>
@@ -36,6 +35,8 @@
                 </section>
             </div>
         </div>
+        <AddPersonModal @findAll="findAll"/>
+        <UpdatePersonModal :personSelected="person" @findAll="findAll" />
     </div>
 </template>
 
@@ -43,10 +44,13 @@
     import Vue from 'vue';
     import { Person } from '../../entities/person';
     import { PersonController } from '../people.controller';
+    import UpdatePersonModal from './UpdatePerson.modal.vue';
+    import AddPersonModal from './AddPerson.modal.vue';
 
     export default Vue.extend({
         name: 'home',
         components: {
+            UpdatePersonModal, AddPersonModal
         },
         data() {
             return {
@@ -65,9 +69,14 @@
             async findAll() {
                 const controller = new PersonController();
                 const response = await controller.findAllPeople();
-                this.people = response.data;
-                
-            }
+                this.people = response.entities;
+            },
+            async findPerson(payload: number) {
+                const controller = new PersonController();
+                const response = await controller.findOnePerson(payload);
+                console.log(response);
+                this.person = response.entity;
+            },
         },
         mounted() {
             this.findAll();

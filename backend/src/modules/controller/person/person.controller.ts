@@ -6,7 +6,6 @@ import {Person} from "./person.model";
 const getAll = async(req : express.Request, res : express.Response) => {
     try{
         const people:any = await findAll();
-        console.log(people);
         res.json(people);
     }catch(err){
         console.log(err);

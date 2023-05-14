@@ -16,7 +16,8 @@ export class SavePersonInteractor implements UseCase<CreatePersonDto, ResponseAp
     constructor (private repository : personRepository) {}
 
     execute(payload : CreatePersonDto): Promise<ResponseApi<Person>> {
-        return this.repository.save(payload);
+        const response = this.repository.save(payload);
+        return response;
     }
     
 }
