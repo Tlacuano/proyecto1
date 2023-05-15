@@ -11,25 +11,36 @@
                     <div class="row">
                         <div class="col-md-6">
                             <section class="text-start">
-                                <button class="btn btn-success m-1" v-b-modal.modal-2>Excel</button>
-                                <button class="btn btn-danger m-1" v-b-modal.modal-2>PDF</button>
+                                <button class="btn btn-success m-1" >Excel</button>
+                                <button class="btn btn-danger m-1" >PDF</button>
                             </section>
                         </div>
                         <div class="col-md-6">
                             <section class="text-end">
-                                <button class="btn btn-success m-1" v-b-modal.modal-2>Subida con Excel</button>
+                                <button class="btn btn-success m-1" v-b-modal.modal-3>Subida con Excel</button>
                                 <button class="btn btn-primary m-1" v-b-modal.modal-2>agregar</button>
                             </section>
                         </div>
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-12">
-                            <b-table striped hover :fields="colums" :items="people">
+                            <b-table 
+                                striped hover 
+                                :fields="colums" 
+                                :items="people"
+                                :per-page="7" 
+                                :current-page="currentPageMain"
+                                >
                                 <template #cell(actions)="data">
                                     <button class="btn btn-warning" @click="findPerson(data.item.id)" v-b-modal.modal-1>actualizar</button>
                                 </template>
-                                
                             </b-table>
+                            <b-pagination
+                                v-model="currentPageMain"
+                                :total-rows="people.length"
+                                :per-page="7"
+                                aria-controls="my-table"
+                            ></b-pagination>
                         </div>
                     </div>
                 </section>
@@ -37,6 +48,7 @@
         </div>
         <AddPersonModal @findAll="findAll"/>
         <UpdatePersonModal :personSelected="person" @findAll="findAll" />
+        <ImportExcelModal @findAll="findAll"/>
     </div>
 </template>
 
@@ -46,11 +58,12 @@
     import { PersonController } from '../people.controller';
     import UpdatePersonModal from './UpdatePerson.modal.vue';
     import AddPersonModal from './AddPerson.modal.vue';
+    import ImportExcelModal from './ImportExcel.modal.vue';
 
     export default Vue.extend({
         name: 'home',
         components: {
-            UpdatePersonModal, AddPersonModal
+            UpdatePersonModal, AddPersonModal, ImportExcelModal
         },
         data() {
             return {
@@ -62,7 +75,9 @@
 
                 ],
                 people: [] as Person[],
-                person: {} as Person
+                person: {} as Person,
+                currentPageMain: 1, // Página actual
+
             };
         },
         methods: {
