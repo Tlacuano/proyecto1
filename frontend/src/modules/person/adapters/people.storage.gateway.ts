@@ -27,6 +27,7 @@ export class PeopleStorageGateway implements personRepository {
     async findAll(): Promise<ResponseApi<Person>> {
         return await fetch('http://localhost:3000/person/').then(data => data.json())
         .then(({data}) => {
+            console.log(data)
             return {
                 status: 200,
                 error: false,
@@ -46,7 +47,7 @@ export class PeopleStorageGateway implements personRepository {
                 status: 200,
                 error: false,
                 message: 'Persona encontrada',
-                entity: data[0]
+                entity: data
             } as ResponseApi<Person>
         }).catch(() => {
             return this.getError()

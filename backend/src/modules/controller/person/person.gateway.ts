@@ -100,7 +100,6 @@ const create = async (person : Person) => {
 };
 
 const update = async (person : Person) => {
-    console.log(person);
     return await client.query('UPDATE people SET name = $1, lastname = $2, email = $3 WHERE id = $4',
         [person.name, person.lastname, person.email, person.id]).then(({rows}) => {
         const people = {
