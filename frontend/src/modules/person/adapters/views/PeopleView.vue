@@ -11,8 +11,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <section class="text-start">
-                                <button class="btn btn-success m-1" >Excel</button>
-                                <button class="btn btn-danger m-1" >PDF</button>
+                                <button class="btn btn-success m-1" @click="descargarExcel">Excel</button>
+                                <button class="btn btn-danger m-1" @click="descargarPDF">PDF</button>
                             </section>
                         </div>
                         <div class="col-md-6">
@@ -24,11 +24,18 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <section>
+                                        <b-form-input type="number" v-model="perPage" class="mb-3"></b-form-input>
+                                    </section>
+                                </div>
+                            </div>
                             <b-table 
                                 striped hover 
                                 :fields="colums" 
                                 :items="people"
-                                :per-page="7" 
+                                :per-page="perPage" 
                                 :current-page="currentPageMain"
                                 >
                                 <template #cell(actions)="data">
@@ -38,7 +45,7 @@
                             <b-pagination
                                 v-model="currentPageMain"
                                 :total-rows="people.length"
-                                :per-page="7"
+                                :per-page="perPage"
                                 aria-controls="my-table"
                             ></b-pagination>
                         </div>
@@ -58,7 +65,14 @@
     import { PersonController } from '../people.controller';
     import UpdatePersonModal from './UpdatePerson.modal.vue';
     import AddPersonModal from './AddPerson.modal.vue';
+
     import ImportExcelModal from './ImportExcel.modal.vue';
+    import pdfMake from 'pdfmake/build/pdfmake';
+    import pdfFonts from 'pdfmake/build/vfs_fonts';
+
+    pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+    import exportFromJSON from 'export-from-json';
 
     export default Vue.extend({
         name: 'home',
@@ -77,7 +91,7 @@
                 people: [] as Person[],
                 person: {} as Person,
                 currentPageMain: 1, // Página actual
-
+                perPage: 8, // Registros por página
             };
         },
         methods: {
@@ -92,6 +106,46 @@
                 console.log(response);
                 this.person = response.entity;
             },
+            descargarPDF(){
+                const contentTable = this.people.map((person) => {
+                    return [person.name, person.lastname, person.email];
+                });
+
+                const docDefinition = {
+                    content : [
+                        {
+                            text: 'Reporte de personas',
+                            style: 'header'
+                        },
+                        {
+                            table: {
+                                widths: ['*', '*', '*'],
+                                body: [
+                                    ['Nombre', 'Apellido', 'Email'],
+                                    ...contentTable
+                                ]
+                            }
+                        }
+                    ]
+                }
+                const filenamePDF = `ReportePersonas${new Date()}.pdf`;
+
+                pdfMake.createPdf(docDefinition).download(filenamePDF);
+
+            },
+            descargarExcel(){
+                const data = this.people.map((person) => {
+                    var obj = {
+                        Nombre: person.name,
+                        Apellido: person.lastname,
+                        Email: person.email
+                    }
+                    return obj;
+                });
+                const fileName = `ReportePersonas${new Date()}.xls`;
+                const exportType = exportFromJSON.types.xls;
+                exportFromJSON({data, fileName, exportType});
+            }
         },
         mounted() {
             this.findAll();
